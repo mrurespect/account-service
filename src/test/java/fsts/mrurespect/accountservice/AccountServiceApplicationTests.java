@@ -1,4 +1,4 @@
-package fsts.mrurepect.accountservice;
+package fsts.mrurespect.accountservice;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

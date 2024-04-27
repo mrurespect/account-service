@@ -1,0 +1,52 @@
+type Query {
+    accountList : [Account]
+    account(id: String!) : Account
+    customerList : [Customer]
+    customer(id:ID!) :Customer
+}
+
+type Account {
+    id: String! ,
+    createDate: String
+    currency: String
+    balance: Float
+    accountType: String
+    customer: Customer
+}
+type Customer {
+    id: ID! ,
+    name:String,
+    email:String,
+    accounts: [Account]
+}
+type Mutation {
+    addAccount(account:AccountDtoRequest): Account
+    updateAccount(account:AccountRequest): Account
+    deleteAccount(id: String!): Boolean
+    addCustomer(customer:CustomerDtoRequest): Customer
+    updateCustomer(customer:CustomerRequest): Customer
+    deleteCustomer(id: ID!): Boolean
+    addAccountToCustomer(customerId: String!, accountId: ID!): Customer
+}
+input AccountDtoRequest {
+    currency: String
+    balance: Float
+    accountType: String
+}
+input AccountRequest {
+    id: String! ,
+    createDate: String
+    currency: String
+    balance: Float
+    accountType: String
+}
+input CustomerDtoRequest {
+    name:String
+    email:String
+}
+input CustomerRequest {
+    id: ID! ,
+    name:String
+    email:String
+}
+
