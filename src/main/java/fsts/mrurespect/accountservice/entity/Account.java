@@ -1,9 +1,12 @@
 package fsts.mrurespect.accountservice.entity;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import fsts.mrurespect.accountservice.enums.AccountType;
+import fsts.mrurespect.accountservice.model.Customer;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
@@ -17,10 +20,10 @@ public class Account {
     @Enumerated(EnumType.STRING)
     private AccountType accountType ;
     private Double balance;
-   // @Setter
-   // @Getter
-   // @ManyToOne
-   // @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-   // private Customer customer;
+
+    @Transient
+    private Customer customer;
+
+    private Long customerId;
 
 }

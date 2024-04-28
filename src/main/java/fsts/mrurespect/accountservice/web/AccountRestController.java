@@ -1,9 +1,11 @@
 package fsts.mrurespect.accountservice.web;
 
+import fsts.mrurespect.accountservice.clients.CustomerRestClient;
 import fsts.mrurespect.accountservice.dto.AccountRequestDto;
 import fsts.mrurespect.accountservice.dto.AccountResponseDto;
 import fsts.mrurespect.accountservice.entity.Account;
 import fsts.mrurespect.accountservice.exception.account.AccountNotFoundException;
+import fsts.mrurespect.accountservice.model.Customer;
 import fsts.mrurespect.accountservice.service.AccountService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,9 +18,11 @@ import java.util.List;
 public class AccountRestController {
 
     private final AccountService accountService;
+    private final CustomerRestClient customerRestClient;
 
-    public AccountRestController(AccountService accountService) {
+    public AccountRestController(AccountService accountService, CustomerRestClient customerRestClient) {
         this.accountService = accountService;
+        this.customerRestClient = customerRestClient;
     }
 
     @GetMapping("/accounts")
@@ -28,7 +32,10 @@ public class AccountRestController {
 
     @GetMapping("/accounts/{id}")
     public ResponseEntity<Account> getAccountById(@PathVariable String id) throws AccountNotFoundException {
-        return new ResponseEntity<>(accountService.getAccountById(id), HttpStatus.OK);
+        Account account = accountService.getAccountById(id);
+        Customer customer = customerRestClient.findCustomerById(account.getCustomerId());
+        account.setCustomer(customer);
+        return new ResponseEntity<>(account, HttpStatus.OK);
     }
 
     @PostMapping("/account")
