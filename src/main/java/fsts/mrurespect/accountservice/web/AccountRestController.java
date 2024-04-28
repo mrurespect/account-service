@@ -27,7 +27,12 @@ public class AccountRestController {
 
     @GetMapping("/accounts")
     public ResponseEntity<List<Account>> getAccounts() {
-        return new ResponseEntity<>(accountService.getAllAccounts(), HttpStatus.OK);
+        List<Account> accounts = accountService.getAllAccounts();
+        accounts.forEach(account -> {
+            Customer customer = customerRestClient.findCustomerById(account.getCustomerId());
+            account.setCustomer(customer);
+        });
+        return new ResponseEntity<>(accounts, HttpStatus.OK);
     }
 
     @GetMapping("/accounts/{id}")

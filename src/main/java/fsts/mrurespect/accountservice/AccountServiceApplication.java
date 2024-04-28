@@ -1,7 +1,9 @@
 package fsts.mrurespect.accountservice;
 
+import fsts.mrurespect.accountservice.clients.CustomerRestClient;
 import fsts.mrurespect.accountservice.entity.Account;
 import fsts.mrurespect.accountservice.enums.AccountType;
+import fsts.mrurespect.accountservice.model.Customer;
 import fsts.mrurespect.accountservice.repository.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -9,7 +11,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
+import org.springframework.hateoas.PagedModel;
 
+import java.util.List;
 import java.util.UUID;
 
 @SpringBootApplication
@@ -20,19 +24,31 @@ public class AccountServiceApplication {
         SpringApplication.run(AccountServiceApplication.class, args);
     }
   @Bean
-  CommandLineRunner run(@Autowired AccountRepository accountRepository) {
+  CommandLineRunner run(@Autowired AccountRepository accountRepository,@Autowired CustomerRestClient customerRestClient){
+
       return args -> {
-              for (int i = 0; i < 10; i++) {
-                  Account account=Account.builder()
-                          .accountType(Math.random()>0.5? AccountType.CURRENT_ACCOUNT: AccountType.SAVINGS_ACCOUNT)
-                          .balance(Math.random()*1000+1000)
-                          .currency("USD")
-                          .id(UUID.randomUUID().toString())
-                          .createDate(new java.util.Date())
-                          .customerId((long) i+1)       //on suppose que les client avec l'id i+1 existes
-                          .build();
-                  accountRepository.save(account);
-              }
-      } ;
+          List<Customer> customers=customerRestClient.allCustomers().getContent().stream().toList();
+          customers.forEach(customer -> {
+              // we create two accounts for each customer
+              Account account1=Account.builder()
+                      .accountType(Math.random()>0.5? AccountType.CURRENT_ACCOUNT: AccountType.SAVINGS_ACCOUNT)
+                      .balance(Math.random()*1000+1000)
+                      .currency("USD")
+                      .id(UUID.randomUUID().toString())
+                      .createDate(new java.util.Date())
+                      .customerId(customer.getId())
+                      .build();
+
+              Account account2=Account.builder()
+                      .accountType(Math.random()>0.5? AccountType.CURRENT_ACCOUNT: AccountType.SAVINGS_ACCOUNT)
+                      .balance(Math.random()*1000+1000)
+                      .currency("USD")
+                      .id(UUID.randomUUID().toString())
+                      .createDate(new java.util.Date())
+                      .customerId(customer.getId())
+                      .build();
+              accountRepository.saveAll(List.of(account1,account2));
+          });
+      };
     }
 }
